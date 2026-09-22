@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ORBIT Insurance</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<script src="scripts/ml-predictor.js"></script>
+
+    <head>
+    <!-- Other meta tags and links -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+
+
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <img src="assets/images/logo.png" alt="ORBIT" style="height: 40px;">
+                    <span>ORBIT</span>
+                </div>
+                <div class="nav-user">
+                    <span id="dashboardUserName"></span>
+                    <button class="btn btn-outline btn-sm" id="dashboardLogoutBtn">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-page="overview">
+                    <i class="fas fa-home"></i>
+                    <span>Overview</span>
+                </li>
+                <li class="menu-item" data-page="recommendations">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Get Recommendations</span>
+                </li>
+                <li class="menu-item" data-page="compare">
+                    <i class="fas fa-balance-scale"></i>
+                    <span>Compare Plans</span>
+                </li>
+                <li class="menu-item" data-page="policies">
+                    <i class="fas fa-file-contract"></i>
+                    <span>My Policies</span>
+                </li>
+                <li class="menu-item" data-page="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </li>
+                <li class="menu-item" data-page="mlpredictor">
+                    <i class="fas fa-brain"></i>
+                    <span>Premium Predictor</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Overview Page -->
+            <div class="dashboard-page active" id="overviewPage">
+                <h1 class="page-title">Dashboard Overview</h1>
+               
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalPolicies">0</h3>
+                            <p>Total Policies</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalCoverage">₹0</h3>
+                            <p>Total Coverage</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalPremium">₹0</h3>
+                            <p>Annual Premium</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h2>Quick Actions</h2>
+                    <div class="action-cards">
+                        <div class="action-card" data-action="recommendations">
+                            <i class="fas fa-lightbulb"></i>
+                            <h3>Get Recommendations</h3>
+                            <p>Find the best insurance plans for you</p>
+                        </div>
+                        <div class="action-card" data-action="compare">
+                            <i class="fas fa-balance-scale"></i>
+                            <h3>Compare Plans</h3>
+                            <p>Compare different insurance options</p>
+                        </div>
+                        <div class="action-card" data-action="policies">
+                            <i class="fas fa-file-contract"></i>
+                            <h3>View Policies</h3>
+                            <p>Manage your existing policies</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h2>Recent Policies</h2>
+                    <div id="recentPoliciesList"></div>
+                </div>
+            </div>
+
+            <!-- Recommendations Page -->
+            <div class="dashboard-page" id="recommendationsPage">
+                <h1 class="page-title">Get Recommendations</h1>
+               
+                <div class="recommendation-form-card">
+                    <form id="recommendationForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="coveragePreference">Desired Coverage Amount (₹)</label>
+                                <select id="coveragePreference" name="coverage_preference">
+                                    <option value="2500000">₹25 Lakhs</option>
+                                    <option value="5000000">₹50 Lakhs</option>
+                                    <option value="7500000">₹75 Lakhs</option>
+                                    <option value="10000000" selected>₹1 Crore</option>
+                                    <option value="15000000">₹1.5 Crore</option>
+                                    <option value="20000000">₹2 Crore</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="budgetPreference">Maximum Budget (₹/year)</label>
+                                <input type="number" id="budgetPreference" name="budget" placeholder="Optional" min="0">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Get Recommendations
+                        </button>
+                    </form>
+                </div>
+
+                <div id="recommendationsResults" style="display: none;">
+                    <h2>Recommended Plans for You</h2>
+                    <div id="recommendationsList"></div>
+                </div>
+            </div>
+
+            <!-- Compare Page -->
+            <div class="dashboard-page" id="comparePage">
+                <h1 class="page-title">Compare Insurance Plans</h1>
+                <p class="page-description">
+                    Select 2-4 plans from <strong>any category</strong> to compare features, benefits, and pricing side-by-side.
+                    You can compare plans from the same category or across different categories!
+                </p>
+
+                <!-- Category Tabs -->
+                <div class="compare-tabs">
+                    <button class="compare-tab active" data-category="Term Life">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>Term Life</span>
+                        <span class="tab-count" id="termLifeTabCount">0</span>
+                    </button>
+                    <button class="compare-tab" data-category="Whole Life">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Whole Life</span>
+                        <span class="tab-count" id="wholeLifeTabCount">0</span>
+                    </button>
+                    <button class="compare-tab" data-category="Endowment">
+                        <i class="fas fa-piggy-bank"></i>
+                        <span>Endowment</span>
+                        <span class="tab-count" id="endowmentTabCount">0</span>
+                    </button>
+                    <button class="compare-tab" data-category="ULIP">
+                        <i class="fas fa-chart-line"></i>
+                        <span>ULIP</span>
+                        <span class="tab-count" id="ulipTabCount">0</span>
+                    </button>
+                    <button class="compare-tab" data-category="Health">
+                        <i class="fas fa-hospital"></i>
+                        <span>Health</span>
+                        <span class="tab-count" id="healthTabCount">0</span>
+                    </button>
+                    <button class="compare-tab" data-category="Motor">
+                        <i class="fas fa-car"></i>
+                        <span>Motor</span>
+                        <span class="tab-count" id="motorTabCount">0</span>
+                    </button>
+                    <button class="compare-tab" data-category="Travel">
+                        <i class="fas fa-plane"></i>
+                        <span>Travel</span>
+                        <span class="tab-count" id="travelTabCount">0</span>
+                    </button>
+                </div>
+
+                <!-- Selected Plans Info -->
+                <div class="compare-selection-info">
+                    <div class="selection-counter">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="selectedCountText">0 plans selected</span>
+                        <span class="selection-limit">(Select 2-4 plans from any category)</span>
+                    </div>
+                    <button class="btn btn-primary" id="compareSelectedPlansBtn" disabled>
+                        <i class="fas fa-balance-scale"></i> Compare Selected Plans
+                    </button>
+                    <button class="btn btn-outline" id="clearSelectionBtn" style="display: none;">
+                        <i class="fas fa-times"></i> Clear Selection
+                    </button>
+                </div>
+
+                <!-- Plans Grid by Category -->
+                <div class="compare-category-content">
+                    <!-- Term Life Plans -->
+                    <div class="compare-plans-section active" data-category="Term Life">
+                        <div class="compare-plans-grid" id="termLifePlans">
+                            <div class="loading-container"><div class="loading"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Whole Life Plans -->
+                    <div class="compare-plans-section" data-category="Whole Life">
+                        <div class="compare-plans-grid" id="wholeLifePlans">
+                            <div class="loading-container"><div class="loading"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Endowment Plans -->
+                    <div class="compare-plans-section" data-category="Endowment">
+                        <div class="compare-plans-grid" id="endowmentPlans">
+                            <div class="loading-container"><div class="loading"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- ULIP Plans -->
+                    <div class="compare-plans-section" data-category="ULIP">
+                        <div class="compare-plans-grid" id="ulipPlans">
+                            <div class="loading-container"><div class="loading"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Health Plans -->
+                    <div class="compare-plans-section" data-category="Health">
+                        <div class="compare-plans-grid" id="healthPlans">
+                            <div class="loading-container"><div class="loading"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Motor Plans -->
+                    <div class="compare-plans-section" data-category="Motor">
+                        <div class="compare-plans-grid" id="motorPlans">
+                            <div class="loading-container"><div class="loading"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Travel Plans -->
+                    <div class="compare-plans-section" data-category="Travel">
+                        <div class="compare-plans-grid" id="travelPlans">
+                            <div class="loading-container"><div class="loading"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Results -->
+                <div id="comparisonResults" style="display: none;">
+                    <div class="comparison-header">
+                        <h2>Plan Comparison Results</h2>
+                        <button class="btn btn-outline" id="backToSelectionBtn">
+                            <i class="fas fa-arrow-left"></i> Back to Selection
+                        </button>
+                    </div>
+                    <div id="comparisonTable"></div>
+                </div>
+            </div>
+
+            <!-- Policies Page -->
+            <div class="dashboard-page" id="policiesPage">
+                <h1 class="page-title">My Insurance Policies</h1>
+                <div id="policiesList"></div>
+            </div>
+
+            <!-- Profile Page -->
+            <div class="dashboard-page" id="profilePage">
+                <h1 class="page-title">My Profile</h1>
+               
+                <div class="profile-card">
+                    <form id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="full_name">Full Name</label>
+                                <input type="text" id="full_name" name="full_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" readonly>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="tel" id="phone" name="phone" pattern="[6-9]\d{9}">
+                            </div>
+                            <div class="form-group">
+                                <label for="dob">Date of Birth</label>
+                                <input type="date" id="dob" name="date_of_birth">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <select id="gender" name="gender">
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="occupation">Occupation</label>
+                                <input type="text" id="occupation" name="occupation">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="income">Annual Income (₹)</label>
+                                <input type="number" id="income" name="annual_income" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" id="city" name="city">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <input type="text" id="state" name="state">
+                            </div>
+                            <div class="form-group">
+                                <label for="pincode">Pincode</label>
+                                <input type="text" id="pincode" name="pincode" pattern="\d{6}">
+                            </div>
+                        </div>
+                        <div class="form-success" id="profileSuccess" style="display: none;"></div>
+                        <div class="form-error" id="profileError" style="display: none;"></div>
+                        <button type="button" class="btn btn-primary" onclick="updateProfile()">
+                            <i class="fas fa-save"></i> Update Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+
+
+
+<!-- ML Predictor Page -->
+<div class="dashboard-page" id="mlpredictorPage">
+    <h1 class="page-title">Premium Predictor</h1>
+    <p class="page-description">
+        Use our advanced AI-powered machine learning model to predict insurance premiums with real-time analytics and actionable insights.
+    </p>
+    
+    <div id="mlDashboardContainer">
+        <!-- ML Dashboard will be loaded here dynamically -->
+        <div class="loading-container" style="margin: 50px 0;">
+            <div class="loading"></div>
+            <p>Loading AI Premium Predictor...</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    <!-- Plan Details Modal -->
+    <div class="modal" id="planDetailsModal">
+        <div class="modal-content modal-large">
+            <span class="close" id="closePlanDetailsModal">&times;</span>
+            <div id="planDetailsContent"></div>
+        </div>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content">
+            <span class="close" id="closePurchaseModal">&times;</span>
+            <h2>Purchase Insurance Plan</h2>
+            <div id="purchaseFormContent"></div>
+        </div>
+    </div>
+
+    <script src="scripts/main.js"></script>
+    <script src="scripts/dashboard.js"></script>
+
+
+
+
+
+
+</body>
+</html>

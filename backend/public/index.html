@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ORBIT – Insurance Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">
+    🤖 ORBIT – Insurance Assistant
+  </div>
+
+  <div class="chat-messages" id="messages"></div>
+
+  <!-- Quick Reply Buttons -->
+  <div class="quick-buttons" id="quickButtons">
+    <button onclick="quickSend('plans')">Plans</button>
+    <button onclick="quickSend('coverage')">Coverage</button>
+    <button onclick="quickSend('premium')">Premium</button>
+    <button onclick="quickSend('benefits')">Benefits</button>
+    <button onclick="quickSend('restart')">Restart</button>
+  </div>
+
+  <div class="chat-input">
+    <input id="input" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
